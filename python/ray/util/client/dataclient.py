@@ -116,10 +116,13 @@ class DataClient:
             self.cv.wait_for(
                 lambda: req_id in self.ready_data or self._in_shutdown)
             if self._in_shutdown:
+                import ray
+                ray.util.disconnect()
                 raise ConnectionError(
                     "Sending request failed because the data channel "
                     "terminated. This is usually due to an error "
-                    f"in handling the most recent request: {req}")
+                    f"in handling the most recent request: {req}. "
+                    "Ray Client will be disconnected.")
             data = self.ready_data[req_id]
             del self.ready_data[req_id]
         return data
